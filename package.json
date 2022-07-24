@@ -6,12 +6,18 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "prisma:dev:migrate": "prisma migrate dev",
-    "db:dev:rm": "docker compose rm dev-db -s -f -v",
-    "db:dev:up": "docker compose up dev-db -d",
-    "db:dev:restart": "yarn db:dev:rm && yarn db:dev:up && sleep 1 && yarn prisma:dev:migrate",
-    "env:dev:pull": "git clone git@github.com:GXSpace/env_configuration.git && [ ! -e .env ] || rm .env && cd env_configuration && git checkout todo-list-backend && mv .env ../. && cd .. && rm -rf env_configuration",
-    "env:dev:push": "git clone git@github.com:GXSpace/env_configuration.git && cd env_configuration && git checkout todo-list-backend && rm .env && cp ../.env . && git add .env && git commit -m 'Updated .env file' && git push origin todo-list-backend && cd .. && rm -rf env_configuration",
+    "prisma:dev:deploy": "dotenv -e .env -- prisma migrate deploy",
+    "db:dev:rm": "dotenv -e .env -- docker compose rm dev-db -s -f -v",
+    "db:dev:up": "dotenv -e .env -- docker compose up dev-db -d",
+    "db:dev:restart": "yarn db:dev:rm && yarn db:dev:up && sleep 1 && yarn prisma:dev:deploy",
+
+    "prisma:test:deploy": "dotenv -e .env.test -- prisma migrate deploy",
+    "db:test:rm": "dotenv -e .env.test -- docker compose rm dev-db -s -f -v",
+    "db:test:up": "dotenv -e .env.test -- docker compose up dev-db -d",
+    "db:test:restart": "yarn db:test:rm && yarn db:test:up && sleep 1 && yarn prisma:test:deploy",
+
+    "env:dev:pull": "git clone git@github.com:GXSpace/env_configuration.git && rm -f .env* && cd env_configuration && git checkout todo-list-backend && mv .env* ../. && cd .. && rm -rf env_configuration",
+    "env:dev:push": "git clone git@github.com:GXSpace/env_configuration.git && cd env_configuration && git checkout todo-list-backend && rm -f .env* && cp ../.env* . && git add .env* && git commit -m 'Updated .env files' && git push origin todo-list-backend && cd .. && rm -rf env_configuration",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -24,7 +30,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "dotenv -e .env.test -- jest --watch --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
@@ -59,6 +65,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "28.1.2",
+    "pactum": "^3.1.13",
     "prettier": "^2.3.2",
     "prisma": "^4.1.0",
     "source-map-support": "^0.5.20",
