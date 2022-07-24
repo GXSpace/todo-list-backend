@@ -11,9 +11,12 @@ export class UserService {
   }
 
   getTodos(user: User) {
-    return this.prisma.todo.findMany({
+    return this.prisma.user.findUnique({
       where: {
-        author: user,
+        id: user.id,
+      },
+      select: {
+        todos: true,
       },
     });
   }
