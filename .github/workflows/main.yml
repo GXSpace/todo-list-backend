@@ -22,7 +22,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Run Jest tests
-        run: env && yarn test:e2e
+        run: yarn test:e2e
         env:
           DATABASE_USER: postgres
           DATABASE_DBNAME: todo
