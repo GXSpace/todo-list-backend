@@ -4,6 +4,8 @@ import * as pactum from 'pactum';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { AppModule } from '../src/app.module';
 import { AuthDto, NewUserDto } from '../src/auth/dto';
+import { TodoDto, TodoPatchDto } from 'src/user/ dto';
+import { inspect } from 'util';
 
 describe('Todo App Backend e2e tests', () => {
   let app: INestApplication;
@@ -109,19 +111,128 @@ describe('Todo App Backend e2e tests', () => {
           .spec()
           .post('/auth/signin')
           .withBody(correctDto)
-          .expectStatus(200);
+          .expectStatus(200)
+          .stores('userToken', 'access_token');
+      });
+    });
+
+    describe('Auth Guards', () => {
+      it('GET /user/me', () => {
+        return pactum.spec().get('/user/me').expectStatus(401);
+      });
+      it('GET /user/todos', () => {
+        return pactum.spec().get('/user/todos').expectStatus(401);
+      });
+      it('POST /user/todos', () => {
+        return pactum.spec().post('/user/todos').expectStatus(401);
+      });
+      it('PATCH /user/todos/1', () => {
+        return pactum.spec().patch('/user/todos/1').expectStatus(401);
+      });
+      it('DELETE /user/todos', () => {
+        return pactum.spec().delete('/user/todos').expectStatus(401);
       });
     });
   });
 
   describe('User', () => {
-    describe('Get Profile', () => {});
+    describe('Get Profile', () => {
+      it('Should get the user profile', () => {
+        return pactum.spec().get('/user/me').withHeaders({
+          Authorization: 'Bearer $S{userToken}',
+        });
+      });
+    });
 
     describe('Todos', () => {
-      describe('Create Todo', () => {});
-      describe('Read Todos', () => {});
-      describe('Update Todo', () => {});
-      describe('Delete Todo', () => {});
+      const now = new Date(Date.now());
+      const todoDto: any = {
+        title: 'Task #1',
+        description: 'Do things',
+        deadline: now.toISOString(),
+      };
+
+      describe('Create Todo', () => {
+        it('Should throw when missing some fields', () => {
+          return pactum
+            .spec()
+            .post('/user/todos')
+            .withBody({})
+            .withHeaders({
+              Authorization: 'Bearer $S{userToken}',
+            })
+            .expectStatus(400);
+        });
+
+        it('Should create a todo', () => {
+          return pactum
+            .spec()
+            .post('/user/todos')
+            .withBody(todoDto)
+            .withHeaders({
+              Authorization: 'Bearer $S{userToken}',
+            })
+            .expectStatus(201)
+            .stores('todoId', 'id');
+        });
+      });
+
+      describe('Read Todos', () => {
+        it('Should read the user todos', () => {
+          return pactum
+            .spec()
+            .get('/user/todos')
+            .withHeaders({
+              Authorization: 'Bearer $S{userToken}',
+            })
+            .expectStatus(200)
+            .expectBodyContains(todoDto.title)
+            .expectBodyContains(todoDto.description)
+            .expectBodyContains(todoDto.deadline);
+        });
+      });
+
+      describe('Update Todo', () => {
+        const patchDto: TodoPatchDto = {
+          title: 'Updated title',
+        };
+
+        it('Should update todo', () => {
+          return pactum
+            .spec()
+            .patch('/user/todos/{id}')
+            .withPathParams('id', '$S{todoId}')
+            .withHeaders({
+              Authorization: 'Bearer $S{userToken}',
+            })
+            .withBody(patchDto)
+            .expectStatus(200);
+        });
+
+        it('Should read the todo updated title', () => {
+          return pactum
+            .spec()
+            .get('/user/todos')
+            .withHeaders({
+              Authorization: 'Bearer $S{userToken}',
+            })
+            .expectStatus(200)
+            .expectBodyContains(patchDto.title);
+        });
+      });
+
+      describe('Delete Todo', () => {
+        it('Should delete the todo', () => {
+          return pactum
+            .spec()
+            .delete('/user/todos')
+            .withHeaders({
+              Authorization: 'Bearer $S{userToken}',
+            })
+            .withBody({ ids: ['$S{todoId}'] })
+            .expectStatus(200);
+        });
+      });
     });
   });
 
