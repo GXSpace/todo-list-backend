@@ -25,7 +25,7 @@ export class UserService {
   }
 
   async createTodo(user: User, todo: TodoDto) {
-    await this.prisma.todo.create({
+    return await this.prisma.todo.create({
       data: {
         authorId: user.id,
         title: todo.title,
