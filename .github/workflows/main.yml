@@ -27,5 +27,5 @@ jobs:
           DATABASE_DBNAME: todo
           DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
           DATABASE_PORT: 5435
-          DATABASE_URL: postgresql://postgres:${{secrets.DATABASE_PASSWORD}}@localhost:5435/todo?schema=public
+          DATABASE_URL: ${{secrets.DATABASE_URL}}
           JWT_SECRET: ${{secrets.JWT_SECRET}}
