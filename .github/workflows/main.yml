@@ -25,7 +25,7 @@ jobs:
         env:
           DATABASE_USER: postgres
           DATABASE_DBNAME: todo
-          DATABASE_PASSWORD: 1sW53K8x1UTT9vYZ1cVl
+          DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
           DATABASE_PORT: 5435
-          DATABASE_URL: postgresql://postgres:1sW53K8x1UTT9vYZ1cVl@localhost:5435/todo?schema=public
-          JWT_SECRET: Ph909!D9iAa!xB!#@JXW
+          DATABASE_URL: postgresql://postgres:${{secrets.DATABASE_PASSWORD}}@localhost:5435/todo?schema=public
+          JWT_SECRET: ${{secrets.JWT_SECRET}}
