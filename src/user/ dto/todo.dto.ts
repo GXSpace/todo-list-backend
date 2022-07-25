@@ -14,11 +14,11 @@ export class TodoDto {
 
   @IsOptional()
   @MaxLength(500)
-  description: string;
+  description?: string;
 
   @IsOptional()
   @IsDateString()
-  deadline: Date;
+  deadline?: Date;
 }
 
 export class TodoPatchDto extends TodoDto {
@@ -28,7 +28,7 @@ export class TodoPatchDto extends TodoDto {
 
   @IsOptional()
   @IsBoolean()
-  done: boolean;
+  done?: boolean;
 }
 
 export class TodoDeleteDto {
