@@ -1,0 +1,31 @@
+# This is a basic workflow to help you get started with Actions
+
+name: App Tests
+
+# Controls when the workflow will run
+on: [push, workflow_dispatch]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  e2e-tests:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v3
+
+      # Runs a single command using the runners shell
+      - name: Install dependencies
+        run: yarn install
+
+      # Runs a set of commands using the runners shell
+      - name: Run Jest tests
+        run: yarn test:e2e
+        env:
+          DATABASE_USER: postgres
+          DATABASE_DBNAME: todo
+          DATABASE_PASSWORD: 1sW53K8x1UTT9vYZ1cVl
+          DATABASE_PORT: 5435
+          DATABASE_URL: postgresql://postgres:1sW53K8x1UTT9vYZ1cVl@localhost:5435/todo?schema=public
+          JWT_SECRET: Ph909!D9iAa!xB!#@JXW
